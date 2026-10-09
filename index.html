@@ -35,7 +35,8 @@
 </main>
 <script>
 (function () {
-  var raw = location.hash.replace(/^#/, "");
+  // Gmail's google.com/url wrapper can deliver the separator as %7C instead of |
+  var raw = location.hash.replace(/^#/, "").replace(/^(\d+)%7C/i, "$1|");
   var cut = raw.indexOf("|");
   var num = (cut < 0 ? raw : raw.slice(0, cut)).replace(/\D/g, "");
   var body = "";
