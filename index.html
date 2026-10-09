@@ -1,0 +1,61 @@
+<!doctype html>
+<!--
+  Tap-to-text bounce page for the website-lead-first-touch task (Scripts/scheduled/tasks/website-lead-first-touch.md).
+  Gmail strips sms: links from email, so the alert email links here instead:
+    https://alexmeridian111.github.io/tap/#<10 digits>|<URL-encoded text>
+  Everything after # stays on the phone (browsers never send the fragment to the server). This page opens Messages
+  with the number and text filled in; Alex edits it if he wants and presses Send. Nothing is stored or logged.
+  Source of truth: this file. Published copy: public repo alexmeridian111/tap (GitHub Pages). Edit here, then push there.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<title>Open in Messages</title>
+<style>
+  :root { --bg: #ffffff; --fg: #1c1c1e; --muted: #6e6e73; --card: #f2f2f7; --btn: #34c759; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #000000; --fg: #f2f2f7; --muted: #98989d; --card: #1c1c1e; } }
+  body { margin: 0; padding: 24px 16px; background: var(--bg); color: var(--fg);
+         font: 17px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  main { max-width: 480px; margin: 0 auto; }
+  .to { color: var(--muted); margin: 0 0 8px; }
+  .msg { background: var(--card); border-radius: 14px; padding: 14px 16px; white-space: pre-wrap; margin: 0 0 20px; }
+  a.btn { display: block; text-align: center; background: var(--btn); color: #fff; text-decoration: none;
+          font-weight: 600; padding: 16px; border-radius: 14px; }
+  .err { color: #ff3b30; }
+</style>
+</head>
+<body>
+<main>
+  <p class="to" id="to"></p>
+  <p class="msg" id="msg"></p>
+  <a class="btn" id="go" href="#">Open in Messages</a>
+</main>
+<script>
+(function () {
+  var raw = location.hash.replace(/^#/, "");
+  var cut = raw.indexOf("|");
+  var num = (cut < 0 ? raw : raw.slice(0, cut)).replace(/\D/g, "");
+  var body = "";
+  try { body = cut < 0 ? "" : decodeURIComponent(raw.slice(cut + 1)); } catch (e) { body = ""; }
+  if (num.length === 11 && num[0] === "1") num = num.slice(1);
+  if (num.length !== 10) {
+    document.getElementById("to").innerHTML = '<span class="err">This link is missing the phone number.</span>';
+    document.getElementById("go").style.display = "none";
+    return;
+  }
+  var pretty = "(" + num.slice(0, 3) + ") " + num.slice(3, 6) + "-" + num.slice(6);
+  document.getElementById("to").textContent = "To: " + pretty;
+  document.getElementById("msg").textContent = body;
+  // iOS reads "sms:<number>&body=", Android reads "?body="
+  var ios = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent);
+  var href = "sms:+1" + num + (body ? (ios ? "&" : "?") + "body=" + encodeURIComponent(body) : "");
+  var go = document.getElementById("go");
+  go.href = href;
+  location.href = href; // opens Messages right away; the button is the fallback
+})();
+</script>
+</body>
+</html>
