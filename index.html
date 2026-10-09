@@ -2,7 +2,7 @@
 <!--
   Tap-to-text bounce page for the website-lead-first-touch task (Scripts/scheduled/tasks/website-lead-first-touch.md).
   Gmail strips sms: links from email, so the alert email links here instead:
-    https://alexmeridian111.github.io/tap/#<10 digits>|<URL-encoded text>
+    https://alexmeridian111.github.io/tap/#<10 digits>/<URL-encoded text>
   Everything after # stays on the phone (browsers never send the fragment to the server). This page opens Messages
   with the number and text filled in; Alex edits it if he wants and presses Send. Nothing is stored or logged.
   Source of truth: this file. Published copy: public repo alexmeridian111/tap (GitHub Pages). Edit here, then push there.
@@ -35,8 +35,8 @@
 </main>
 <script>
 (function () {
-  // Gmail's google.com/url wrapper can deliver the separator as %7C instead of |
-  var raw = location.hash.replace(/^#/, "").replace(/^(\d+)%7C/i, "$1|");
+  // Separator is "/" (2026-10-08); older links used "|", which wrappers deliver as %7C
+  var raw = location.hash.replace(/^#/, "").replace(/^(\d+)(?:\/|%7C|%2F)/i, "$1|");
   var cut = raw.indexOf("|");
   var num = (cut < 0 ? raw : raw.slice(0, cut)).replace(/\D/g, "");
   var body = "";
